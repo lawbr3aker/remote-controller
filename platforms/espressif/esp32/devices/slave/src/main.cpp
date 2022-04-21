@@ -1,8 +1,8 @@
-#include <Arduino.h>
+#include "../../../shared/include/io/pin.h"
+#include "../../../shared/include/io/mux/mux_4bit.h"
+
 void setup() {
-// write your initialization code here
 }
 
 void loop() {
-// write your code here
 }
