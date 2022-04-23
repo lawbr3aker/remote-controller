@@ -26,6 +26,9 @@ namespace core {
           {
       }
     };
+
+    type_template(t(size) pins_count)
+    type_alias   (t(pins_set), std::array<t(pin), pins_count>)
   }
 
   namespace utils {
@@ -46,13 +49,10 @@ namespace core {
       };
 
       func_define(f(set_status), void,
-              types::t(pin)::t(status) status
+            types::t(pin)::t(status) status
           ) const {
         digitalWrite(pin.id, status);
       }
     };
-
-    type_template(t(size) contorllers_count)
-    type_alias   (t(pin_controllers_set), std::array<u(pin_controller), contorllers_count>)
   }
 }
