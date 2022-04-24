@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility>
-
 #include "../pin.h"
 
 namespace core {

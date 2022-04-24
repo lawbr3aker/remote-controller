@@ -16,4 +16,5 @@ void init_io() {
 
 void io_pins_reader() {
   mux_devices->set_channel_r();
+  Serial.println(mux_devices->get_channel());
 }
