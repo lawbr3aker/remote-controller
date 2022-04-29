@@ -1,104 +1,87 @@
 #include <Arduino.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 
-TaskHandle_t task1_h, task2_h;
+#include <task/pre/io/handler.hpp>
+#include <task/pre/io/mux_handler.hpp>
 
-void task2(void *) {
-  Serial.print(xPortGetCoreID());
-  Serial.println(": Called 'void task2()'");
-  delay(1000);
-  for (;;)
-    Serial.println("task2");
+#define mux_pin(id) core::types::io::pin_t(id, core::types::io::pin_t::output)
+#define mux_handler(mux, signal, channel, callback) \
+ mux.register_handler(handler::io::mux_handler_t(   \
+      core::types::io::pin_t(signal, core::types::io::pin_t::pull_up), \
+      handler::on_low, channel,                     \
+      [](core::utils::u(pin_controller) controller) -> int8_t callback \
+  ));
+void test2() {
+  Serial.println("called");
 }
-
-void task1(void *) {
-  Serial.print(xPortGetCoreID());
-  Serial.println(": Called 'void task1()'");
-
-  delay(1000);
-
-  Serial.print(xPortGetCoreID());
-  Serial.println(": Called 'void task1()'");
-
-  xTaskCreatePinnedToCore(
-             task2, /* Task function. */
-             "Task2",   /* name of task. */
-             1000,     /* Stack size of task */
-             NULL,      /* parameter of the task */
-             1,         /* priority of the task */
-             &task2_h,    /* Task handle to keep track of created task */
-             1);
-
-  vTaskSuspend(task1_h);
+void test1() {
+  Serial.println("calle1");
+  test2();
+}
+void test(void *) {
+  for (;;) {
+    Serial.println("slalam,");
+    vTaskDelay(1000);
+    test2();
+  }
 }
 
 void setup() {
+  namespace io = core::types::io;
+    Serial.begin(115200);
+  Serial.println("initialized");
+//  xTaskCreate(test, "test", 1000, nullptr, 1, nullptr);
+//  namespace tp_io = core::task::pre::io;
+//
   Serial.begin(115200);
-  xTaskCreatePinnedToCore(
-             task1, /* Task function. */
-             "Task1",   /* name of task. */
-             1000,     /* Stack size of task */
-             NULL,      /* parameter of the task */
-             1,         /* priority of the task */
-             &task1_h,    /* Task handle to keep track of created task */
-             0);
-  delay(500);
+  Serial.println("initialized");
+
+  core::types::controllers_set_t<4> mux_pins = {mux_pin(0), mux_pin(4), mux_pin(16), mux_pin(17)};
+
+  handler::io::mux_handler main_mux((core::utils::mux::multi_mux(mux_pins)));
+
+  mux_handler(main_mux, 32, 0,  {Serial.println("Channel 0");return 1;})
+  mux_handler(main_mux, 32, 1,  {Serial.println("Channel 1");return 1;})
+  mux_handler(main_mux, 32, 2,  {Serial.println("Channel 2");return 1;})
+  mux_handler(main_mux, 32, 3,  {Serial.println("Channel 3");return 1;})
+  mux_handler(main_mux, 32, 4,  {Serial.println("Channel 4");return 1;})
+  mux_handler(main_mux, 32, 5,  {Serial.println("Channel 5");return 1;})
+  mux_handler(main_mux, 32, 6,  {Serial.println("Channel 6");return 1;})
+  mux_handler(main_mux, 32, 7,  {Serial.println("Channel 7");return 1;})
+  mux_handler(main_mux, 32, 8,  {Serial.println("Channel 8");return 1;})
+  mux_handler(main_mux, 32, 9,  {Serial.println("Channel 9");return 1;})
+  mux_handler(main_mux, 32, 10, {Serial.println("Channel 10");return 1;})
+  mux_handler(main_mux, 32, 11, {Serial.println("Channel 11");return 1;})
+
+  main_mux.execute();
+//  handler::io::gpio_handler main_handler;
+//  main_handler.register_handler(handler::io::gpio_handler_t(
+//      core::types::io::pin_t(21, core::types::io::pin_t::pull_up), handler::on_low,
+//      [](core::utils::u(pin_controller)) -> int8_t {
+//        Serial.println("salam");
+//        return 1;
+//      }));
+//  main_handler.execute();
+//  handler::io::mux_handler a(core::types::io::pin_t(21, core::types::io::pin_t::pull_up),
+//                              handler::on_low, [](void *) -> void {
+//    Serial.println("clicked");
+//        vTaskDelete(nullptr);
+//  });
+//  handler::io::mux_handler::execute();
+//
+//  auto pin_13_handler = create_callback(tp_io::callback_t, {
+//    Serial.print("button clicked! ");
+//    vTaskDelete(nullptr);
+//  });
+//
+//  Serial.println("salam");
+//  tp_io::pin_handler communication_button(io::pin_t(21, io::pin_t::pull_up),
+//                                       tp_io::pin_handler::pin,
+//                                       tp_io::pin_handler::on_low,
+//                                       pin_13_handler);
+//
+//  Serial.println("bye");
+//  tp_io::pin_handler::handle();
 }
 
-bool temp = false;
 void loop() {
-  if (not temp) {
-    Serial.print(xPortGetCoreID());
-    Serial.println(": Called 'void loop()'");
-    delay(1000);
-  }
-  temp = true;
-  Serial.println("loop");
 }
-
-/*
-#include <Arduino.h>
-
-#include "../../../shared/include/io/pin.h"
-#include "../../../shared/include/io/mux/mux_4bit.h"
-#include "../../../shared/include/io/mux/multi_mux.h"
-
-//#include "cores/0/io_handler.h"
-
-core::utils::mux::multi_mux<
-    core::utils::mux::mux_4bit> *mux_devices;
-core::types::pins_set_t<4>      *mux_states ;
-
-void setup() {
-  using namespace core::types;
-  using namespace core::utils;
-
-  Serial.begin(115200);
-
-  mux_states  = new pins_set_t<4>({pin_t(0, pin_t::output),
-                                   pin_t(4, pin_t::output),
-                                   pin_t(16, pin_t::output),
-                                   pin_t(17, pin_t::output)});
-  mux_devices = new mux::multi_mux<
-                        core::utils::mux::mux_4bit>(*mux_states);
-}
-int delay_m = 1000;
-void loop() {
-  for (int i = 0 ; i  < 13 ; ++i) {
-    mux_devices->set_channel(i);
-    delay_m -= 20;
-    if (delay_m <= 0)
-      delay_m = 1000;
-    delay(delay_m);
-  }
-  for (int i = 11 ; i  > -1 ; --i) {
-    mux_devices->set_channel(i);
-    delay_m -= 20;
-    if (delay_m <= 0)
-      delay_m = 1000;
-    delay(delay_m);
-  }
-  esp32_gpioMux_t ;
-}
-*/
