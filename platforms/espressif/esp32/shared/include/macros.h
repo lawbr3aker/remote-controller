@@ -22,3 +22,5 @@
 #define enumeration(...) {__VA_ARGS__}
 
 #define unlimited_loop for (;;)
+#define succeed return 1;
+#define failed  return 0;

@@ -31,7 +31,7 @@ namespace core {
           return _channel;
         }
 
-        func_define(set_channel, core::utils::u(pin_controller),
+        func_define(set_channel, void,
               func_param(channel, core::types::io::t(pin)::t(id))
             ) {
           _channel = channel;
@@ -43,7 +43,7 @@ namespace core {
           }
         }
 
-        func_define(set_channel_r, core::utils::u(pin_controller),
+        func_define(set_channel_r, void,
             ) {
           return set_channel(_channel >= 15 ? 0 : _channel + 1);
         }
