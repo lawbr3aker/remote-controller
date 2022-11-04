@@ -8,9 +8,7 @@ namespace core {
   namespace task {
     type_alias(t(millisecond), unsigned long long)
 
-    struct t(callback) {
-      t(int8) (*callback)();
-    };
+    typedef t(int8) (*t(callback))();
 
     namespace cycle {
       struct t(period) {

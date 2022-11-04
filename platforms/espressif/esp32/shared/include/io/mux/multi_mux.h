@@ -38,7 +38,7 @@ namespace core {
           for (short state_index = 0; state_index < 4; ++state_index) {
             _states[state_index]
                 .set_status(channel%2 ? core::types::io::t(pin)::high
-                                       : core::types::io::t(pin)::low );
+                                      : core::types::io::t(pin)::low );
             channel /= 2;
           }
         }

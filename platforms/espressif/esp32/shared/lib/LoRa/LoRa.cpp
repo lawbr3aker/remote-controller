@@ -101,7 +101,7 @@ int LoRaClass::begin(long frequency)
   delay(50);
 #endif
 
-  // setup pins
+  // setup virtual_digital_pins
   pinMode(_ss, OUTPUT);
   // set SS high
   digitalWrite(_ss, HIGH);
